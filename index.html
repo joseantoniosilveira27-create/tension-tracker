@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<!-- saved from url=(0053)file:///C:/Users/Babu_/Downloads/tension-tracker.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Tensión · Diario</title>
+<link href="./index_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f0eb;
+    --surface: #ffffff;
+    --surface2: #ede8e1;
+    --border: #d8d0c6;
+    --accent: #c0392b;
+    --accent2: #e74c3c;
+    --accent3: #922b21;
+    --text: #1a1512;
+    --text2: #6b5e54;
+    --text3: #a89b90;
+    --good: #1e8449;
+    --warn: #ca6f1e;
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  header {
+    padding: 24px 20px 16px;
+    border-bottom: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .logo span {
+    color: var(--text2);
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    display: block;
+    font-weight: 300;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 4px;
+    border: 1px solid var(--border);
+  }
+  .tab-bar button {
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .tab-bar button.active {
+    background: var(--accent);
+    color: white;
+    font-weight: 500;
+  }
+
+  main { padding: 20px; max-width: 480px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin: 24px 0 10px;
+  }
+
+  .datetime-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: white;
+    margin-bottom: 8px;
+  }
+  .datetime-chip::before { content: '🩺'; font-size: 14px; }
+
+  /* ── TENSION DISPLAY ── */
+  .tension-block {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+  .tension-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+  .tension-sep {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--accent);
+    text-align: center;
+    line-height: 1;
+  }
+  .tension-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .tension-field label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .tension-field input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--accent);
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    text-align: center;
+    padding: 10px 8px;
+    outline: none;
+    transition: border-color .2s;
+    -moz-appearance: textfield;
+  }
+  .tension-field input[type="number"]::-webkit-outer-spin-button,
+  .tension-field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .tension-field input[type="number"]:focus { border-color: var(--accent); }
+
+  .tension-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 10px;
+  }
+  .tension-status {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  /* ── PULSO ── */
+  .pulse-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .pulse-icon {
+    font-size: 28px;
+    animation: beat 1.2s infinite;
+  }
+  @keyframes beat {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+  .pulse-wrap input[type="number"] {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    text-align: center;
+    padding: 10px;
+    outline: none;
+    -moz-appearance: textfield;
+    transition: border-color .2s;
+  }
+  .pulse-wrap input[type="number"]::-webkit-outer-spin-button,
+  .pulse-wrap input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .pulse-wrap input[type="number"]:focus { border-color: var(--accent); }
+  .pulse-label { font-size: 11px; color: var(--text3); }
+
+  /* ── CAMPOS GENERALES ── */
+  .field { margin-bottom: 16px; }
+  .field > label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 7px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .field > label .num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; flex-shrink: 0;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    padding: 12px 14px;
+    resize: none;
+    outline: none;
+    transition: border-color .2s;
+    height: 72px;
+  }
+  textarea:focus { border-color: var(--accent); }
+
+  /* ── TOGGLE ── */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color .2s;
+  }
+  .toggle-wrap:has(input:checked) { border-color: var(--accent); }
+  .toggle-wrap input[type="checkbox"] { display: none; }
+  .toggle-pill {
+    width: 46px; height: 24px;
+    border-radius: 12px;
+    background: var(--border);
+    flex-shrink: 0;
+    position: relative;
+    transition: background .2s;
+  }
+  .toggle-pill::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: white;
+    top: 3px; left: 3px;
+    transition: all .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  .toggle-wrap:has(input:checked) .toggle-pill { background: var(--accent); }
+  .toggle-wrap:has(input:checked) .toggle-pill::after { transform: translateX(22px); }
+  .toggle-text { font-size: 14px; color: var(--text); }
+
+  /* ── SELECTOR (Comida) ── */
+  .selector-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .selector-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--text2);
+    transition: all .2s;
+    user-select: none;
+  }
+  .selector-btn.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-weight: 500;
+  }
+  .selector-btn .icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+  /* ── SUBMIT ── */
+  .submit-btn {
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 20px;
+    letter-spacing: 1px;
+    transition: opacity .2s;
+    box-shadow: 0 4px 12px rgba(192,57,43,.3);
+  }
+  .submit-btn:active { opacity: .85; }
+  .submit-btn:disabled { opacity: .6; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--text);
+    color: white;
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── HISTORY ── */
+  #historyView { display: none; }
+
+  .entry-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    animation: fadeIn .3s ease;
+    border-left: 4px solid var(--accent);
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .entry-date { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--accent); }
+  .entry-time { font-size: 11px; color: var(--text3); }
+
+  .tension-display {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    letter-spacing: -1px;
+  }
+  .tension-display span { font-size: 16px; color: var(--text3); margin-left: 8px; font-family: 'IBM Plex Mono', monospace; }
+
+  .entry-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .entry-item {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+  }
+  .entry-item .key { font-size: 10px; color: var(--text3); margin-bottom: 2px; text-transform: uppercase; letter-spacing: .5px; }
+  .entry-item .val { font-size: 13px; color: var(--text); }
+  .entry-item.full { grid-column: 1/-1; }
+
+  .btn-delete {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: all .2s;
+  }
+  .btn-delete:active { border-color: var(--accent); color: var(--accent); }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+
+  .btn-export {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 10px;
+    letter-spacing: .5px;
+    transition: border-color .2s;
+  }
+  .btn-export:active { border-color: var(--accent); }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .config-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 20px;
+  }
+  .config-box h3 { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--accent); margin-bottom: 8px; }
+  .config-box p { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+  .config-box input[type="text"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .config-box input[type="text"]:focus { border-color: var(--accent); }
+  .btn-save-config {
+    margin-top: 8px;
+    width: 100%;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    tensión·diario
+    <span>seguimiento cardiovascular</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="syncBadge" style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px;">
+      <span id="syncDot" style="width:6px;height:6px;border-radius:50%;background:#ccc;display:inline-block;"></span>
+      <span id="syncLabel">Sheets</span>
+    </div>
+    <div class="tab-bar">
+      <button class="active" onclick="showTab(&#39;form&#39;, this)">Registrar</button>
+      <button onclick="showTab(&#39;history&#39;, this)">Historial</button>
+      <button onclick="showTab(&#39;config&#39;, this)">Config</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══ FORM ══ -->
+  <div id="formView">
+
+    <p class="section-label">nuevo registro</p>
+    <div class="datetime-chip" id="nowChip">viernes, 3 de abril · 21:55</div>
+
+    <!-- Tensión -->
+    <p class="section-label">tensión arterial (mmHg)</p>
+    <div class="tension-block">
+      <div class="tension-row">
+        <div class="tension-field">
+          <label>Sistólica (alta)</label>
+          <input type="number" id="f_alta" min="60" max="250" placeholder="120" oninput="updateStatus()">
+        </div>
+        <div class="tension-sep">/</div>
+        <div class="tension-field">
+          <label>Diastólica (baja)</label>
+          <input type="number" id="f_baja" min="40" max="150" placeholder="80" oninput="updateStatus()">
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:10px;">
+        <span class="tension-status" id="tensionStatus" style="background:var(--surface2);color:var(--text3);">introduce los valores</span>
+      </div>
+    </div>
+
+    <!-- Pulso -->
+    <p class="section-label">ritmo cardíaco</p>
+    <div class="field">
+      <div class="pulse-wrap">
+        <span class="pulse-icon">❤️</span>
+        <input type="number" id="f_pulso" min="30" max="220" placeholder="72">
+        <span class="pulse-label">ppm</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <p class="section-label">factores</p>
+
+    <!-- Actividad -->
+    <div class="field">
+      <label><span class="num">1</span> Actividad realizada</label>
+      <textarea id="f_actividad" placeholder="p.ej. caminar 30 min, reposo, trabajo de oficina..."></textarea>
+    </div>
+
+    <!-- Alimentos -->
+    <div class="field">
+      <label><span class="num">2</span> Alimentos ingeridos</label>
+      <textarea id="f_alimentos" placeholder="p.ej. ensalada, pollo a la plancha, fruta..."></textarea>
+    </div>
+
+    <!-- Café -->
+    <div class="field">
+      <label><span class="num">3</span> Tazas de café</label>
+      <div class="pulse-wrap">
+        <span style="font-size:24px;">☕</span>
+        <input type="number" id="f_cafe" min="0" max="20" value="0" placeholder="0">
+        <span class="pulse-label">tazas</span>
+      </div>
+    </div>
+
+    <!-- Sal -->
+    <div class="field">
+      <label><span class="num">4</span> ¿Sal en las comidas?</label>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="f_sal">
+        <div class="toggle-pill"></div>
+        <span class="toggle-text">Sí, he añadido sal</span>
+      </label>
+    </div>
+
+    <!-- Comido fuera -->
+    <div class="field">
+      <label><span class="num">5</span> ¿Has comido fuera?</label>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="f_fuera">
+        <div class="toggle-pill"></div>
+        <span class="toggle-text">Sí, he comido en restaurante o fuera de casa</span>
+      </label>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="saveEntry()">GUARDAR REGISTRO</button>
+
+  </div><!-- /formView -->
+
+  <!-- ══ HISTORY ══ -->
+  <div id="historyView">
+    <p class="section-label">registros guardados</p>
+    <button class="btn-export" onclick="exportCSV()">⬇ Exportar como CSV</button>
+    <div id="entriesList" style="margin-top:14px;"></div>
+  </div>
+
+  <!-- ══ CONFIG ══ -->
+  <div id="configView" style="display:none;">
+    <div class="config-box">
+      <h3>Google Sheets</h3>
+      <p>Pega aquí la URL de tu Google Apps Script para sincronizar los datos automáticamente.</p>
+      <input type="text" id="sheetsUrl" placeholder="https://script.google.com/macros/s/..." value="">
+      <button class="btn-save-config" onclick="saveConfig()">Guardar URL</button>
+    </div>
+
+    <div class="config-box" style="margin-top:12px;">
+      <h3>Recordatorios</h3>
+      <p>Configura alarmas en tu Android para medir a las mismas horas cada día. Se recomienda medir por la mañana en ayunas, a mediodía y por la noche.</p>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--accent);">08:00</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--accent);">14:00</div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--accent);">21:00</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast">✓ Guardado</div>
+
+<script>
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  const date = now.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+  const time = now.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('nowChip').textContent = `${date} · ${time}`;
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+
+
+// ── TENSION STATUS ──
+function updateStatus() {
+  const alta = parseInt(document.getElementById('f_alta').value);
+  const baja = parseInt(document.getElementById('f_baja').value);
+  const el = document.getElementById('tensionStatus');
+  if (!alta || !baja) { el.textContent = 'introduce los valores'; el.style.background = 'var(--surface2)'; el.style.color = 'var(--text3)'; return; }
+  let label, bg, color;
+  if (alta < 120 && baja < 80)       { label = '✓ Normal'; bg = '#e8f5e9'; color = '#1e8449'; }
+  else if (alta < 130 && baja < 80)  { label = '⚠ Elevada'; bg = '#fff8e1'; color = '#ca6f1e'; }
+  else if (alta < 140 || baja < 90)  { label = '⚠ Alta grado 1'; bg = '#fff3e0'; color = '#ca6f1e'; }
+  else if (alta >= 140 || baja >= 90){ label = '🔴 Alta grado 2'; bg = '#fce4e4'; color = '#c0392b'; }
+  if (alta >= 180 || baja >= 120)    { label = '🚨 Crisis hipertensiva'; bg = '#fce4e4'; color = '#922b21'; }
+  el.textContent = label; el.style.background = bg; el.style.color = color;
+}
+
+// ── TABS ──
+function showTab(tab, btn) {
+  document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('formView').style.display   = tab === 'form'    ? '' : 'none';
+  document.getElementById('historyView').style.display = tab === 'history' ? '' : 'none';
+  document.getElementById('configView').style.display  = tab === 'config'  ? '' : 'none';
+  if (tab === 'history') renderHistory();
+  if (tab === 'config') loadConfig();
+}
+
+// ── STORAGE ──
+function getEntries() {
+  try { return JSON.parse(localStorage.getItem('tension_entries') || '[]'); } catch(e) { return []; }
+}
+function saveEntries(arr) { localStorage.setItem('tension_entries', JSON.stringify(arr)); }
+
+// ── CONFIG ──
+function getConfig() {
+  try { return JSON.parse(localStorage.getItem('tension_config') || '{}'); } catch(e) { return {}; }
+}
+function saveConfig() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  localStorage.setItem('tension_config', JSON.stringify({ sheetsUrl: url }));
+  updateSyncBadge(!!url);
+  showToast('✓ Configuracion guardada');
+}
+function loadConfig() {
+  const cfg = getConfig();
+  if (cfg.sheetsUrl) document.getElementById('sheetsUrl').value = cfg.sheetsUrl;
+  updateSyncBadge(!!cfg.sheetsUrl);
+}
+function updateSyncBadge(connected) {
+  document.getElementById('syncDot').style.background = connected ? '#1e8449' : '#ccc';
+  document.getElementById('syncLabel').textContent = connected ? 'Sheets ✓' : 'Sheets';
+}
+
+// ── SAVE ──
+async function saveEntry() {
+  const alta = document.getElementById('f_alta').value;
+  const baja = document.getElementById('f_baja').value;
+  if (!alta || !baja) { showToast('⚠ Introduce la tension arterial'); return; }
+
+  const now = new Date();
+  const entry = {
+    id: now.getTime(),
+    fecha: now.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long', year:'numeric' }),
+    hora: now.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' }),
+    ubicacion: 'Obteniendo...',
+    alta, baja,
+    pulso: document.getElementById('f_pulso').value || '-',
+    actividad: document.getElementById('f_actividad').value.trim(),
+    alimentos: document.getElementById('f_alimentos').value.trim(),
+    cafe: document.getElementById('f_cafe').value || '0',
+    sal: document.getElementById('f_sal').checked ? 'Sí' : 'No',
+    comida: document.getElementById('f_fuera').checked ? 'Fuera' : 'En casa',
+  };
+
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'OBTENIENDO UBICACION...';
+  btn.disabled = true;
+
+  // Geolocalización
+  if (navigator.geolocation) {
+    await new Promise(resolve => {
+      navigator.geolocation.getCurrentPosition(
+        async pos => {
+          const lat = pos.coords.latitude.toFixed(5);
+          const lon = pos.coords.longitude.toFixed(5);
+          try {
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+            const geo = await r.json();
+            const addr = geo.address;
+            entry.ubicacion = addr.village || addr.town || addr.city || addr.municipality || `${lat},${lon}`;
+            if (addr.state) entry.ubicacion += ', ' + addr.state;
+          } catch(e) { entry.ubicacion = `${lat},${lon}`; }
+          resolve();
+        },
+        () => { entry.ubicacion = 'No disponible'; resolve(); },
+        { timeout: 6000 }
+      );
+    });
+  } else { entry.ubicacion = 'No soportado'; }
+
+  // Guardar local
+  const entries = getEntries();
+  entries.unshift(entry);
+  saveEntries(entries);
+  resetForm();
+
+  // Enviar a Sheets
+  const cfg = getConfig();
+  if (cfg.sheetsUrl) {
+    btn.textContent = 'ENVIANDO...';
+    try {
+      await fetch(cfg.sheetsUrl, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      });
+      showToast('✓ Guardado y enviado a Google Sheets');
+    } catch(e) { showToast('✓ Guardado local (sin conexion)'); }
+  } else {
+    showToast('✓ Registro guardado');
+  }
+  btn.textContent = 'GUARDAR REGISTRO';
+  btn.disabled = false;
+}
+
+function resetForm() {
+  document.getElementById('f_alta').value = '';
+  document.getElementById('f_baja').value = '';
+  document.getElementById('f_pulso').value = '';
+  document.getElementById('f_actividad').value = '';
+  document.getElementById('f_alimentos').value = '';
+  document.getElementById('f_cafe').value = 0;
+  document.getElementById('f_sal').checked = false;
+  document.getElementById('f_fuera').checked = false;
+  document.getElementById('tensionStatus').textContent = 'introduce los valores';
+  document.getElementById('tensionStatus').style.background = 'var(--surface2)';
+  document.getElementById('tensionStatus').style.color = 'var(--text3)';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── HISTORY ──
+function renderHistory() {
+  const entries = getEntries();
+  const el = document.getElementById('entriesList');
+  if (!entries.length) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📋</div><div>Sin registros todavía.</div></div>`;
+    return;
+  }
+  el.innerHTML = entries.map(e => {
+    const a = parseInt(e.alta), b = parseInt(e.baja);
+    let statusColor = '#1e8449';
+    if (a >= 130 || b >= 80) statusColor = '#ca6f1e';
+    if (a >= 140 || b >= 90) statusColor = '#c0392b';
+    return `
+    <div class="entry-card">
+      <div class="entry-header">
+        <div>
+          <div class="entry-date">${e.fecha}</div>
+          <div class="entry-time">${e.hora}</div>
+          ${e.ubicacion && e.ubicacion !== 'No disponible' ? `<div style="font-size:10px;color:var(--text3);margin-top:2px">📍 ${e.ubicacion}</div>` : ''}
+        </div>
+        <button class="btn-delete" onclick="deleteEntry(${e.id})">borrar</button>
+      </div>
+      <div class="tension-display" style="color:${statusColor}">
+        ${e.alta}/${e.baja}
+        <span>mmHg</span>
+      </div>
+      <div class="entry-grid">
+        <div class="entry-item">
+          <div class="key">Pulso</div>
+          <div class="val">${e.pulso} ppm</div>
+        </div>
+        <div class="entry-item">
+          <div class="key">Comida</div>
+          <div class="val">${e.comida}</div>
+        </div>
+        <div class="entry-item">
+          <div class="key">Cafés</div>
+          <div class="val">${e.cafe} tazas</div>
+        </div>
+        <div class="entry-item">
+          <div class="key">Sal</div>
+          <div class="val">${e.sal}</div>
+        </div>
+        ${e.actividad ? `<div class="entry-item full"><div class="key">Actividad</div><div class="val">${e.actividad}</div></div>` : ''}
+        ${e.alimentos ? `<div class="entry-item full"><div class="key">Alimentos</div><div class="val">${e.alimentos}</div></div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteEntry(id) {
+  saveEntries(getEntries().filter(e => e.id !== id));
+  renderHistory();
+}
+
+// ── EXPORT CSV ──
+function exportCSV() {
+  const entries = getEntries();
+  if (!entries.length) { alert('No hay registros para exportar.'); return; }
+  const headers = ['Ubicacion','Fecha','Hora','T.Alta','T.Baja','Pulso','Actividad','Alimentos','Tazas cafe','Sal','Comida'];
+  const rows = entries.map(e => [
+    `"${e.ubicacion||''}"`, `"${e.fecha}"`, e.hora,
+    e.alta, e.baja, e.pulso,
+    `"${e.actividad||''}"`, `"${e.alimentos||''}"`,
+    e.cafe, e.sal, e.comida
+  ].join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  const blob = new Blob(['\ufeff'+csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'tension_diario.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Init
+loadConfig();
+</script>
+
+
+</body></html>

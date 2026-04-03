@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0053)file:///C:/Users/Babu_/Downloads/tension-tracker.html -->
+<!-- saved from url=(0055)file:///C:/Users/Babu_/Downloads/tension-tracker_1.html -->
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -493,7 +493,7 @@
   <div id="formView">
 
     <p class="section-label">nuevo registro</p>
-    <div class="datetime-chip" id="nowChip">viernes, 3 de abril · 21:55</div>
+    <div class="datetime-chip" id="nowChip">viernes, 3 de abril · 22:05</div>
 
     <!-- Tensión -->
     <p class="section-label">tensión arterial (mmHg)</p>
@@ -724,10 +724,12 @@ async function saveEntry() {
 
   // Enviar a Sheets
   const cfg = getConfig();
-  if (cfg.sheetsUrl) {
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwfoSyYB7TE8RXT3ydX6yEVgWsNwfu6aO7NEwSdGGlAQnKFWOdZ0yKV0F_SaYGOh0XA/exec';
+  if (SHEETS_URL || cfg.sheetsUrl) {
+    const url = SHEETS_URL || cfg.sheetsUrl;
     btn.textContent = 'ENVIANDO...';
     try {
-      await fetch(cfg.sheetsUrl, {
+      await fetch(url, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(entry)
